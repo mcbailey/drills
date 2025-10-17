@@ -16,6 +16,9 @@
         .details-panel.show {
             max-height: 500px; /* Adjust as needed */
         }
+        .printable-details {
+            display: none;
+        }
         @media print {
             body * {
                 visibility: hidden;
@@ -28,12 +31,27 @@
                 left: 0;
                 top: 0;
                 width: 100%;
+                box-shadow: none;
+                border: none;
             }
             #plan-header-print {
                 display: block !important;
             }
-            #plan-controls, #print-button-container, #empty-plan-message {
+            #plan-controls, #print-button-container, #empty-plan-message, .screen-only {
                 display: none !important;
+            }
+            .printable-details {
+                display: block !important;
+                padding-bottom: 1rem;
+                margin-bottom: 1rem;
+                border-bottom: 1px solid #e5e7eb;
+            }
+            .plan-item-container:last-child .printable-details {
+                border-bottom: none;
+            }
+            #plan-summary {
+                text-align: left !important;
+                font-size: 1.25rem;
             }
         }
     </style>
@@ -155,8 +173,6 @@
 
                     const rows = data.table.rows;
 
-                    // **FIX**: Filter out any null rows which can happen from empty rows in the spreadsheet.
-                    // A null row would cause the .map() to crash and stop processing.
                     allDrills = rows.filter(row => row && row.c).map((row, index) => {
                         return {
                             id: `drill-${index}`,
@@ -294,13 +310,23 @@
                 plan.forEach(planItem => {
                     const drill = allDrills.find(d => d.id === planItem.id);
                     const itemEl = document.createElement('div');
-                    itemEl.className = 'flex justify-between items-center bg-gray-50 p-3 rounded-md';
+                    itemEl.className = 'bg-gray-50 p-3 rounded-md plan-item-container';
                     itemEl.innerHTML = `
-                        <div>
-                            <p class="font-semibold">${drill.drillName}</p>
-                            <p class="text-sm text-gray-500">${drill.duration} min</p>
+                        <div class="flex justify-between items-center screen-only">
+                            <div>
+                                <p class="font-semibold">${drill.drillName}</p>
+                                <p class="text-sm text-gray-500">${drill.duration} min</p>
+                            </div>
+                            <button data-drill-id="${drill.id}" class="remove-from-plan-button text-red-500 hover:text-red-700 font-bold text-xl px-2">&times;</button>
                         </div>
-                        <button data-drill-id="${drill.id}" class="remove-from-plan-button text-red-500 hover:text-red-700 font-bold text-xl px-2">&times;</button>
+                        <div class="printable-details text-sm space-y-2">
+                            <h4 class="font-bold text-base text-gray-900">${drill.drillName}</h4>
+                            <p><strong class="font-semibold">Category:</strong> ${drill.skillCategory}</p>
+                            <p><strong class="font-semibold">Duration:</strong> ${drill.duration} min</p>
+                            <div class="mt-2"><strong class="font-semibold">Setup:</strong> <div class="text-gray-700 whitespace-pre-wrap">${drill.setup}</div></div>
+                            <div class="mt-2"><strong class="font-semibold">Instructions:</strong> <div class="text-gray-700 whitespace-pre-wrap">${drill.instructions}</div></div>
+                            <div class="mt-2"><strong class="font-semibold">Coaching Points:</strong> <div class="text-gray-700 whitespace-pre-wrap">${drill.coachingPoints}</div></div>
+                        </div>
                     `;
                     planItemsContainer.appendChild(itemEl);
                 });
