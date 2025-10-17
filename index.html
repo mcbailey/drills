@@ -277,7 +277,7 @@
                                 </div>
                                 <h3 class="text-lg font-bold text-gray-800 mt-1">${drill.drillName}</h3>
                                 <p class="text-sm text-gray-500 mt-1"><span class="font-semibold">Duration:</span> ${drill.duration} min</p>
-                                <div class="mt-2 text-sm text-gray-600">${formatTextWithLineBreaks(drill.objective)}</div>
+                                <div class="mt-2 text-sm text-gray-600">${formatTextForHtml(drill.objective)}</div>
                             </div>
                             <div class="mt-4 pt-4 border-t border-gray-200">
                                 <div class="flex justify-between items-center">
@@ -285,9 +285,9 @@
                                     <button data-drill-id="${drill.id}" class="add-to-plan-button bg-green-500 text-white w-8 h-8 rounded-full font-bold text-lg flex items-center justify-center hover:bg-green-600 transition">+</button>
                                 </div>
                                 <div id="details-${drill.id}" class="details-panel mt-4 text-sm space-y-2">
-                                    <div><strong class="font-semibold">Setup:</strong> <div>${formatTextWithLineBreaks(drill.setup)}</div></div>
-                                    <div><strong class="font-semibold">Instructions:</strong> <div>${formatTextWithLineBreaks(drill.instructions)}</div></div>
-                                    <div><strong class="font-semibold">Coaching Points:</strong> <div>${formatTextWithLineBreaks(drill.coachingPoints)}</div></div>
+                                    <div><strong class="font-semibold">Setup:</strong> <div>${formatTextForHtml(drill.setup)}</div></div>
+                                    <div><strong class="font-semibold">Instructions:</strong> <div>${formatTextForHtml(drill.instructions)}</div></div>
+                                    <div><strong class="font-semibold">Coaching Points:</strong> <div>${formatTextForHtml(drill.coachingPoints)}</div></div>
                                     ${drill.link ? (isImageUrl(drill.link) ? 
                                         `<div><strong class="font-semibold">Diagram:</strong><img src="${drill.link}" alt="${drill.drillName} diagram" class="mt-1 border rounded-md w-full object-contain"></div>` :
                                         `<div><a href="${drill.link}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Watch Video &rarr;</a></div>`
@@ -329,9 +329,9 @@
                             <h4 class="font-bold text-base text-gray-900">${drill.drillName}</h4>
                             <p><strong class="font-semibold">Category:</strong> ${drill.skillCategory}</p>
                             <p><strong class="font-semibold">Duration:</strong> ${drill.duration} min</p>
-                            <div class="mt-2"><strong class="font-semibold">Setup:</strong> <div class="text-gray-700">${formatTextWithLineBreaks(drill.setup)}</div></div>
-                            <div class="mt-2"><strong class="font-semibold">Instructions:</strong> <div class="text-gray-700">${formatTextWithLineBreaks(drill.instructions)}</div></div>
-                            <div class="mt-2"><strong class="font-semibold">Coaching Points:</strong> <div class="text-gray-700">${formatTextWithLineBreaks(drill.coachingPoints)}</div></div>
+                            <div class="mt-2"><strong class="font-semibold">Setup:</strong> <div class="text-gray-700">${formatTextForHtml(drill.setup)}</div></div>
+                            <div class="mt-2"><strong class="font-semibold">Instructions:</strong> <div class="text-gray-700">${formatTextForHtml(drill.instructions)}</div></div>
+                            <div class="mt-2"><strong class="font-semibold">Coaching Points:</strong> <div class="text-gray-700">${formatTextForHtml(drill.coachingPoints)}</div></div>
                             ${drill.link ? (isImageUrl(drill.link) ? 
                                 `<div class="mt-2"><strong class="font-semibold">Diagram:</strong><img src="${drill.link}" alt="${drill.drillName} diagram"></div>` :
                                 `<div class="mt-2"><strong class="font-semibold">Video Link:</strong> <span class="text-blue-600">${drill.link}</span></div>`
@@ -359,17 +359,21 @@
                 return /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(url);
             }
 
-            function formatTextWithLineBreaks(text) {
+            function formatTextForHtml(text) {
                 if (!text) return '';
-                // Basic HTML escaping
-                const escaped = text
+                // First, un-escape any escaped newlines that might come from the JSON
+                const unescaped = text.replace(/\\n/g, '\n');
+                
+                // Then, escape characters that have special meaning in HTML
+                const escapedHtml = unescaped
                     .replace(/&/g, "&amp;")
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;")
                     .replace(/"/g, "&quot;")
                     .replace(/'/g, "&#039;");
-                // Replace newlines with <br> tags
-                return escaped.replace(/\n/g, '<br>');
+                    
+                // Finally, replace the real newline characters with <br> tags
+                return escapedHtml.replace(/\n/g, '<br>');
             }
 
             function updatePlanSummary() {
