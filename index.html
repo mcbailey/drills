@@ -285,7 +285,10 @@
                                     <div><strong class="font-semibold">Setup:</strong> <div class="whitespace-pre-wrap">${drill.setup}</div></div>
                                     <div><strong class="font-semibold">Instructions:</strong> <div class="whitespace-pre-wrap">${drill.instructions}</div></div>
                                     <div><strong class="font-semibold">Coaching Points:</strong> <div class="whitespace-pre-wrap">${drill.coachingPoints}</div></div>
-                                    ${drill.link ? `<div><a href="${drill.link}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Watch Video &rarr;</a></div>` : ''}
+                                    ${drill.link ? (isImageUrl(drill.link) ? 
+                                        `<div><strong class="font-semibold">Diagram:</strong><img src="${drill.link}" alt="${drill.drillName} diagram" class="mt-1 border rounded-md w-full object-contain"></div>` :
+                                        `<div><a href="${drill.link}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Watch Video &rarr;</a></div>`
+                                    ) : ''}
                                 </div>
                             </div>
                         </div>
@@ -326,6 +329,10 @@
                             <div class="mt-2"><strong class="font-semibold">Setup:</strong> <div class="text-gray-700 whitespace-pre-wrap">${drill.setup}</div></div>
                             <div class="mt-2"><strong class="font-semibold">Instructions:</strong> <div class="text-gray-700 whitespace-pre-wrap">${drill.instructions}</div></div>
                             <div class="mt-2"><strong class="font-semibold">Coaching Points:</strong> <div class="text-gray-700 whitespace-pre-wrap">${drill.coachingPoints}</div></div>
+                            ${drill.link ? (isImageUrl(drill.link) ? 
+                                `<div class="mt-2"><strong class="font-semibold">Diagram:</strong><img src="${drill.link}" alt="${drill.drillName} diagram" class="mt-1 border rounded-md w-full object-contain"></div>` :
+                                `<div class="mt-2"><strong class="font-semibold">Video Link:</strong> <span class="text-blue-600">${drill.link}</span></div>`
+                            ) : ''}
                         </div>
                     `;
                     planItemsContainer.appendChild(itemEl);
@@ -341,6 +348,12 @@
                 if (parts.length === 1 && !isNaN(parts[0])) return { min: parts[0], max: parts[0] };
                 if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) return { min: parts[0], max: parts[1] };
                 return { min: 0, max: 0 };
+            }
+
+            function isImageUrl(url) {
+                if (!url) return false;
+                // Simple check for common image file extensions
+                return /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(url);
             }
 
             function updatePlanSummary() {
@@ -466,4 +479,5 @@
     </script>
 </body>
 </html>
+
 
